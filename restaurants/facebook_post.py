@@ -37,8 +37,16 @@ class Facebook:
     #     publicly accessible URL of the image to be posted
     # Return Type: None
     def publish_photo_msg(self, message, image_url):
-        # write your code here
-        return
+       datas = {
+       'url': image_url,
+       'published': 'true',
+       'access_token': self.page_access_token,
+       'caption' : message,
+       } 
+       requests.post('https://graph.facebook.com/v5.0/'+self.page_id+'/photos', data=datas)
+       
+    
+
 
 if __name__ == '__main__':
     facebook = Facebook()
@@ -48,8 +56,8 @@ if __name__ == '__main__':
     # 2) Copy the URL of the image and assign it to the 'image_url' variable
     #    Eg: image_url = 'http://ksmartstatic.sify.com/cmf-1.0.0/appflow/bawarchi.com/Image/oeturjecjjdah_bigger.jpg'
     # 3) Fill the 'my_name' variable with your name so that you know the posts you have created
-    image_url = ''
-    my_name = ''
+    image_url = 'https://assetsds.cdnedge.bluemix.net/sites/default/files/styles/very_big_1/public/feature/images/ice_cream_1.jpg'
+    my_name = 'SidhantK'
 
     message = my_name + ' likes this ice-cream!'
     facebook.publish_photo_msg(message, image_url)
