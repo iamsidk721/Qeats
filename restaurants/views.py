@@ -9,6 +9,7 @@ from rest_framework import status
 
 import restaurants.image_uploader
 import restaurants.facebook_post
+import restaurants.clarifai_tag_suggestions
 
 # Create your views here.
 def get_access_token(token_name):
@@ -198,11 +199,25 @@ class GetTags(APIView):
         body = request.data
         assert set(['imgBase64']) == set(sorted(list(body.keys())))
         img_b64 = body['imgBase64']
-        restaurants.image_uploader.upload(img_b64)
+        image_url = restaurants.image_uploader.upload(img_b64)
 
-
+        # TODO: CRIO_TASK_MODULE_TAG_SUGGESTION
+        # Add call to clarifai api here.
+        # Refer todo in qeats/restaurants/clarifai_tag_suggestions.py for instructions
+        api_key = get_access_token('CLARIFAI_API_KEY')
+        tags = restaurants.clarifai_tag_suggestions.get_tags_suggestions(api_key,image_url)
+        
         return JsonResponse(tags, safe=False)
 
+# @POST
+# ENDPOINT 'qeats/v1/reviews/share'
+# {
+#     'imgBase64' : '',
+#     'text' : 'Great Food!',
+#     'orderId' : '0x12312',
+#     'tags' : ['Briyani'],
+#     'share' : ['Facebook', 'Pinterest']
+# }
 class ShareReview(ListAPIView):
     def post(self, request, *args, **kwargs):
         body = request.data
@@ -223,6 +238,7 @@ class ShareReview(ListAPIView):
         if 'Pinterest' in body['share']:
             pinterest = restaurants.pinterest_post.Pinterest()
             pinterest.publish_photo_msg(message, image_url)
+        
 
         response_data = {
             "reviewId": body['orderId'],
